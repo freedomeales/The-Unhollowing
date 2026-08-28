@@ -4,7 +4,7 @@
     { "type": "minecraft:count", "count": 1 },
     { "type": "minecraft:in_square" },
     { "type": "minecraft:heightmap", "heightmap": "WORLD_SURFACE_WG" },
-    { "type": "minecraft:block_predicate", "predicate": { "type": "minecraft:matching_blocks", "blocks": ["minecraft:dirt", "minecraft:grass_block", "minecraft:podzol"] } },
+       { "type": "minecraft:block_predicate_filter", "predicate": { "type": "minecraft:matching_blocks", "blocks": ["minecraft:dirt", "minecraft:grass_block", "minecraft:podzol"] } },
     { "type": "minecraft:biome" }
   ]
 }
