@@ -1,0 +1,11 @@
+{
+  "forgotten_call": {
+    "sounds": [{ "name": "unhollowing:forgotten_call" }]
+  },
+  "forgotten_hurt": {
+    "sounds": [{ "name": "unhollowing:forgotten_hurt" }]
+  },
+  "forgotten_death": {
+    "sounds": [{ "name": "unhollowing:forgotten_death" }]
+  }
+}
