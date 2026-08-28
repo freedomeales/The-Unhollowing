@@ -21,22 +21,33 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.EntityDimensions;
 
 @SuppressWarnings("null")
 public final class WatcherEntity extends Monster {
+
     public WatcherEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
         setPersistenceRequired();
     }
 
+    // Full 3-block eye height
+    @Override
+    protected float getStandingEyeHeight(Pose pose, EntityDimensions size) {
+        return 2.8F;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 45.0D)
-                .add(Attributes.MOVEMENT_SPEED, 0.32D)
-                .add(Attributes.FOLLOW_RANGE, 48.0D)
-                .add(Attributes.ATTACK_DAMAGE, 90.0D)
-                .add(Attributes.KNOCKBACK_RESISTANCE, 0.55D);
+                .add(Attributes.MAX_HEALTH, 1000.0D)
+                .add(Attributes.MOVEMENT_SPEED, 0.40D)
+                .add(Attributes.FOLLOW_RANGE, 800.0D)
+                .add(Attributes.ATTACK_DAMAGE, 120.0D)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 0.0D);
     }
 
     @Override
@@ -57,6 +68,7 @@ public final class WatcherEntity extends Monster {
             return;
         }
 
+        // Learning sprint habit
         if (player.isSprinting()) {
             player.getPersistentData().putInt("unhollowing_sprint_habit", 1200);
         }
@@ -64,10 +76,24 @@ public final class WatcherEntity extends Monster {
         if (distanceTo(player) <= 4.5D && tickCount % 40 == 0) {
             breakInFrontOfPlayer(player);
         }
+
         int sprintHabit = player.getPersistentData().getInt("unhollowing_sprint_habit");
         if (sprintHabit > 0) {
             player.getPersistentData().putInt("unhollowing_sprint_habit", sprintHabit - 20);
         }
+
+        // Learning-based movement speed
+        double learnedSpeed = 0.40D;
+
+        if (sprintHabit > 800) {
+            learnedSpeed = 0.55D;
+        } else if (sprintHabit > 400) {
+            learnedSpeed = 0.48D;
+        } else if (sprintHabit > 200) {
+            learnedSpeed = 0.44D;
+        }
+
+        getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(learnedSpeed);
 
         double distance = distanceTo(player);
         if (distance <= 12.0D && hasLineOfSight(player) && player.getRandom().nextInt(3) == 0) {
@@ -76,6 +102,7 @@ public final class WatcherEntity extends Monster {
             player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 100, 0, false, false));
             level().playSound(null, blockPosition(), SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 2.0F, 0.45F);
         }
+
         if (sprintHabit > 0 && distance > 12.0D) {
             setTarget(player);
         }
@@ -97,14 +124,24 @@ public final class WatcherEntity extends Monster {
     }
 
     private void breakInFrontOfPlayer(ServerPlayer player) {
-        net.minecraft.core.BlockPos target = blockPosition().relative(getDirection());
+
+        BlockPos target = player.blockPosition().relative(player.getDirection());
         BlockState state = level().getBlockState(target);
         float hardness = state.getDestroySpeed(level(), target);
-        if (!state.isAir() && hardness >= 0.0F && hardness <= 3.0F
-                && state.getBlock() != Blocks.BEDROCK && state.getBlock() != Blocks.WATER
+
+        if (!state.isAir()
+                && hardness >= 0.0F && hardness <= 3.0F
+                && state.getBlock() != Blocks.BEDROCK
+                && state.getBlock() != Blocks.WATER
                 && state.getBlock() != Blocks.LAVA) {
-            level().destroyBlock(target, true, this);
+
+            level().destroyBlock(target, true, player);
+
             level().playSound(null, target, UnhollowingMod.FORGOTTEN_CALL.get(), SoundSource.HOSTILE, 0.45F, 0.55F);
+
+            @SuppressWarnings("deprecation")
+String lastBroken = BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
+            player.getPersistentData().putString("unhollowing_last_broken_block", lastBroken);
         }
     }
 }
