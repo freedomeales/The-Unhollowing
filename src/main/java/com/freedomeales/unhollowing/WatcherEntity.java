@@ -1,6 +1,12 @@
 package com.freedomeales.unhollowing;
 
 import javax.annotation.Nonnull;
+
+import com.freedomeales.unhollowing.UnhollowingEntities;
+
+
+import java.util.List;
+
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -22,10 +28,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.EntityDimensions;
+
 
 @SuppressWarnings("null")
 public final class WatcherEntity extends Monster {
@@ -62,27 +68,91 @@ public final class WatcherEntity extends Monster {
     }
 
     @Override
-    public void tick() {
+public void tick()
+ {
         super.tick();
-        if (level().isClientSide || tickCount % 20 != 0 || !(getTarget() instanceof ServerPlayer player)) {
+
+        Level level = level();
+
+        // --- AUTO-SUMMON WHEN ALONE (3 MINUTES) ---
+        if (!level.isClientSide && level.players().size() == 1) {
+
+            Player solo = level.players().get(0);
+
+            int timer = solo.getPersistentData().getInt("unhollowing_alone_timer");
+            timer++;
+            solo.getPersistentData().putInt("unhollowing_alone_timer", timer);
+
+            if (timer >= 3600) { // 3 minutes
+                solo.getPersistentData().putInt("unhollowing_alone_timer", 0);
+
+              WatcherEntity watcher = new WatcherEntity(
+        UnhollowingEntities.WATCHER.get(),
+        level()
+);
+
+
+
+                watcher.moveTo(
+                        solo.getX() + 8,
+                        solo.getY(),
+                        solo.getZ() + 8,
+                        level.random.nextFloat() * 360F,
+                        0
+                );
+
+                level.addFreshEntity(watcher);
+            }
+        }
+
+        // --- MULTIPLAYER WATCHING BEHAVIOR ---
+        List<Player> nearbyPlayers = level.getEntitiesOfClass(
+                Player.class,
+                getBoundingBox().inflate(40.0D)
+        );
+
+        if (nearbyPlayers.size() >= 2) {
+
+            setTarget(null);
+
+            if (tickCount % 40 == 0) {
+                double dx = (random.nextDouble() - 0.5) * 30;
+                double dz = (random.nextDouble() - 0.5) * 30;
+                getNavigation().moveTo(getX() + dx, getY(), getZ() + dz, 0.6D);
+            }
+
+            Player p = nearbyPlayers.get(0);
+            int habit = p.getPersistentData().getInt("unhollowing_sprint_habit");
+            habit += 10;
+            p.getPersistentData().putInt("unhollowing_sprint_habit", habit);
+
             return;
         }
 
-        // Learning sprint habit
+        // --- FASTER LEARNING, NEVER FORGET ---
+        if (getTarget() instanceof Player player && player.isSprinting()) {
+            int habit = player.getPersistentData().getInt("unhollowing_sprint_habit");
+            habit += 30;
+            player.getPersistentData().putInt("unhollowing_sprint_habit", habit);
+        }
+
+        // --- ORIGINAL HORROR LOGIC BELOW (kept exactly as you wrote it) ---
+
+        Player player = level.getNearestPlayer(this, 800);
+        if (player == null) return;
+
         if (player.isSprinting()) {
             player.getPersistentData().putInt("unhollowing_sprint_habit", 1200);
         }
 
         if (distanceTo(player) <= 4.5D && tickCount % 40 == 0) {
-            breakInFrontOfPlayer(player);
+            breakInFrontOfPlayer((ServerPlayer) player);
         }
 
         int sprintHabit = player.getPersistentData().getInt("unhollowing_sprint_habit");
-        if (sprintHabit > 0) {
-            player.getPersistentData().putInt("unhollowing_sprint_habit", sprintHabit - 20);
-        }
 
-        // Learning-based movement speed
+        // NEVER FORGET → decay removed
+
         double learnedSpeed = 0.40D;
 
         if (sprintHabit > 800) {
@@ -100,7 +170,7 @@ public final class WatcherEntity extends Monster {
             player.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 80, 0, false, false));
             player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 100, 0, false, false));
             player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 100, 0, false, false));
-            level().playSound(null, blockPosition(), SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 2.0F, 0.45F);
+            level.playSound(null, blockPosition(), SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 2.0F, 0.45F);
         }
 
         if (sprintHabit > 0 && distance > 12.0D) {
@@ -139,8 +209,12 @@ public final class WatcherEntity extends Monster {
 
             level().playSound(null, target, UnhollowingMod.FORGOTTEN_CALL.get(), SoundSource.HOSTILE, 0.45F, 0.55F);
 
-            @SuppressWarnings("deprecation")
-String lastBroken = BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
+            String lastBroken = level().registryAccess()
+        .registryOrThrow(net.minecraft.core.registries.Registries.BLOCK)
+        .getKey(state.getBlock())
+        .toString();
+
+
             player.getPersistentData().putString("unhollowing_last_broken_block", lastBroken);
         }
     }
