@@ -26,4 +26,4 @@
 
 <p>The first horror systems are now active. Isolated players underground can hear low cave sounds, lose torches behind them, encounter motionless mobs staring at them, see temporary Blackbark structures vanish when approached, and receive books written in their own name. Animals can become confused and glow in the deep darkness. The Watcher learns when a player runs, appears only when the player is alone, and causes darkness, confusion, weakness, and a deep roar when it gets close.</p>
 
-<p>Redwood trees grow extremely tall in taiga regions, using Redwood Log, Redwood Leaves, and Blackbark blocks. The Watcher currently uses Minecraft's Warden sound events for its low, unnatural calls; custom Wendigo audio can be added later as licensed sound files.</p>
+<p>The new Redwood Forest atmosphere appears in taiga and forest biomes. Extremely tall Redwood trees and darker Blackbark trees use Redwood Log, Redwood Leaves, and Blackbark blocks to make familiar forests feel wrong. The Forgotten uses original custom OGG sounds: a low call, a strained hurt cry, and a descending death groan.</p>
