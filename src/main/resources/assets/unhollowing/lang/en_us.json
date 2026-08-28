@@ -2,5 +2,11 @@
   "entity.unhollowing.watcher": "The Forgotten",
   "block.unhollowing.redwood_log": "Redwood Log",
   "block.unhollowing.redwood_leaves": "Redwood Leaves",
-  "block.unhollowing.blackbark": "Blackbark"
+  "block.unhollowing.redwood_planks": "Redwood Planks",
+  "block.unhollowing.blackwood_log": "Blackwood Log",
+  "block.unhollowing.blackwood_leaves": "Blackwood Leaves",
+  "block.unhollowing.blackwood_planks": "Blackwood Planks",
+  "block.unhollowing.blackbark": "Blackbark",
+  "biome.unhollowing.redwood_forest": "Redwood Forest",
+  "biome.unhollowing.blackwood_forest": "Blackwood Forest"
 }

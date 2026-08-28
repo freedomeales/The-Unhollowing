@@ -24,6 +24,12 @@
 
 ## Development Status
 
-<p>The first horror systems are now active. Isolated players underground can hear low cave sounds, lose torches behind them, encounter motionless mobs staring at them, see temporary Blackbark structures vanish when approached, and receive books written in their own name. Animals can become confused and glow in the deep darkness. The Watcher learns when a player runs, appears only when the player is alone, and causes darkness, confusion, weakness, and a deep roar when it gets close.</p>
+<p>The first horror systems are now active. Isolated players underground can hear cave ambience, faint footsteps, and breathing, lose torches behind them, encounter motionless mobs staring at them, see temporary Blackbark structures vanish when approached, and receive books written in their own name. Animals can become confused and glow in the deep darkness. The Watcher learns when a player runs, appears only when the player is alone, and causes darkness, confusion, weakness, and a deep roar when it gets close.</p>
 
 <p>The new Redwood Forest atmosphere appears in taiga and forest biomes. Extremely tall Redwood trees and darker Blackbark trees use Redwood Log, Redwood Leaves, and Blackbark blocks to make familiar forests feel wrong. The Forgotten uses original custom OGG sounds: a low call, a strained hurt cry, and a descending death groan.</p>
+
+<p>Redwood and Blackwood are separate wood families with their own logs, leaves, and planks. Dedicated Redwood Forest and Blackwood Forest biomes are registered for future biome placement, while current trees only place on dirt, grass, or podzol and never on water.</p>
+
+## Horror Checklist
+
+<p>The current build includes motionless staring mobs, torches that can go out behind the player, custom cave footsteps and breathing, temporary structures that disappear when approached, confused and glowing animals, a habit-aware Forgotten that targets isolated players, stronger events deeper underground, and books addressed to the player's own name.</p>

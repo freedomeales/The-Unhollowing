@@ -70,6 +70,13 @@ public final class HorrorEvents {
             player.level().playSound(null, player.blockPosition(), SoundEvents.WARDEN_TENDRIL_CLICKS,
                 SoundSource.AMBIENT, 0.35F, 0.55F);
         }
+        if (player.getRandom().nextBoolean()) {
+            player.level().playSound(null, player.blockPosition(), UnhollowingMod.CAVE_FOOTSTEPS.get(),
+                    SoundSource.AMBIENT, 0.3F, 0.7F);
+        } else {
+            player.level().playSound(null, player.blockPosition(), UnhollowingMod.CAVE_BREATHING.get(),
+                    SoundSource.AMBIENT, 0.24F, 0.62F);
+        }
 
         BlockPos spawnPos = findWatcherPosition(player);
         if (spawnPos == null) {
