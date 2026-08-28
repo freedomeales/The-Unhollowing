@@ -1,6 +1,6 @@
 {
   "type": "forge:add_features",
-  "biomes": "#minecraft:is_forest",
+  "biomes": "#minecraft:is_taiga",
   "features": ["unhollowing:redwood_tree", "unhollowing:blackbark_tree"],
   "step": "vegetal_decoration"
 }
