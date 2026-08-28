@@ -7,5 +7,11 @@
   },
   "forgotten_death": {
     "sounds": [{ "name": "unhollowing:forgotten_death" }]
+  },
+  "cave_footsteps": {
+    "sounds": [{ "name": "unhollowing:cave_footsteps" }]
+  },
+  "cave_breathing": {
+    "sounds": [{ "name": "unhollowing:cave_breathing" }]
   }
 }

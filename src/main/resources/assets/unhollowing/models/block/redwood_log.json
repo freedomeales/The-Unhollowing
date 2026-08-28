@@ -1,4 +1,4 @@
 {
   "parent": "minecraft:block/cube_column",
-  "textures": { "end": "minecraft:block/spruce_log_top", "side": "minecraft:block/spruce_log" }
+  "textures": { "end": "minecraft:block/red_concrete", "side": "minecraft:block/red_nether_bricks" }
 }

@@ -9,6 +9,10 @@ import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeGenerationSettings;
+import net.minecraft.world.level.biome.BiomeSpecialEffects;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -35,12 +39,25 @@ public final class UnhollowingMod {
                 DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, MOD_ID);
 
         public static final RegistryObject<Block> REDWOOD_LOG = registerBlock("redwood_log",
-            () -> new RotatedPillarBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BROWN)
+            () -> new RotatedPillarBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED)
                 .strength(3.0F).sound(net.minecraft.world.level.block.SoundType.WOOD)));
         public static final RegistryObject<Block> REDWOOD_LEAVES = registerBlock("redwood_leaves",
             () -> new LeavesBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GREEN)
                 .strength(0.2F).randomTicks().sound(net.minecraft.world.level.block.SoundType.GRASS)
                 .noOcclusion()));
+        public static final RegistryObject<Block> REDWOOD_PLANKS = registerBlock("redwood_planks",
+            () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED)
+                .strength(2.0F).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> BLACKWOOD_LOG = registerBlock("blackwood_log",
+            () -> new RotatedPillarBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK)
+                .strength(4.0F).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> BLACKWOOD_LEAVES = registerBlock("blackwood_leaves",
+            () -> new LeavesBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK)
+                .strength(0.2F).randomTicks().sound(net.minecraft.world.level.block.SoundType.GRASS)
+                .noOcclusion()));
+        public static final RegistryObject<Block> BLACKWOOD_PLANKS = registerBlock("blackwood_planks",
+            () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK)
+                .strength(2.0F).sound(net.minecraft.world.level.block.SoundType.WOOD)));
         public static final RegistryObject<Block> BLACKBARK = registerBlock("blackbark",
             () -> new RotatedPillarBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK)
                 .strength(4.0F).sound(net.minecraft.world.level.block.SoundType.WOOD)));
@@ -48,6 +65,22 @@ public final class UnhollowingMod {
         public static final RegistryObject<SoundEvent> FORGOTTEN_CALL = registerSound("forgotten_call");
         public static final RegistryObject<SoundEvent> FORGOTTEN_HURT = registerSound("forgotten_hurt");
         public static final RegistryObject<SoundEvent> FORGOTTEN_DEATH = registerSound("forgotten_death");
+        public static final RegistryObject<SoundEvent> CAVE_FOOTSTEPS = registerSound("cave_footsteps");
+        public static final RegistryObject<SoundEvent> CAVE_BREATHING = registerSound("cave_breathing");
+
+        public static final DeferredRegister<Biome> BIOMES = DeferredRegister.create(ForgeRegistries.BIOMES, MOD_ID);
+        public static final RegistryObject<Biome> REDWOOD_FOREST = BIOMES.register("redwood_forest",
+            () -> new Biome.BiomeBuilder().temperature(0.7F).downfall(0.8F)
+                .specialEffects(new BiomeSpecialEffects.Builder().fogColor(0x4A5147).waterColor(0x385F65)
+                    .waterFogColor(0x1B2525).skyColor(0x56605A).build())
+                .mobSpawnSettings(new MobSpawnSettings.Builder().build())
+                .generationSettings(BiomeGenerationSettings.EMPTY).build());
+        public static final RegistryObject<Biome> BLACKWOOD_FOREST = BIOMES.register("blackwood_forest",
+            () -> new Biome.BiomeBuilder().temperature(0.3F).downfall(0.9F)
+                .specialEffects(new BiomeSpecialEffects.Builder().fogColor(0x171A18).waterColor(0x202D31)
+                    .waterFogColor(0x090C0C).skyColor(0x202422).build())
+                .mobSpawnSettings(new MobSpawnSettings.Builder().build())
+                .generationSettings(BiomeGenerationSettings.EMPTY).build());
 
 
     public static final RegistryObject<EntityType<WatcherEntity>> WATCHER = ENTITY_TYPES.register("watcher",
@@ -62,6 +95,7 @@ public final class UnhollowingMod {
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         SOUNDS.register(modEventBus);
+        BIOMES.register(modEventBus);
         modEventBus.addListener(this::registerAttributes);
     }
 

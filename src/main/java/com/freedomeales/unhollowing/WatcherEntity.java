@@ -19,6 +19,8 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.server.level.ServerPlayer;
 
 @SuppressWarnings("null")
@@ -33,7 +35,7 @@ public final class WatcherEntity extends Monster {
                 .add(Attributes.MAX_HEALTH, 45.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.32D)
                 .add(Attributes.FOLLOW_RANGE, 48.0D)
-                .add(Attributes.ATTACK_DAMAGE, 7.0D)
+                .add(Attributes.ATTACK_DAMAGE, 90.0D)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.55D);
     }
 
@@ -57,6 +59,10 @@ public final class WatcherEntity extends Monster {
 
         if (player.isSprinting()) {
             player.getPersistentData().putInt("unhollowing_sprint_habit", 1200);
+        }
+
+        if (distanceTo(player) <= 4.5D && tickCount % 40 == 0) {
+            breakInFrontOfPlayer(player);
         }
         int sprintHabit = player.getPersistentData().getInt("unhollowing_sprint_habit");
         if (sprintHabit > 0) {
@@ -88,5 +94,17 @@ public final class WatcherEntity extends Monster {
     @Override
     protected SoundEvent getDeathSound() {
         return UnhollowingMod.FORGOTTEN_DEATH.get();
+    }
+
+    private void breakInFrontOfPlayer(ServerPlayer player) {
+        net.minecraft.core.BlockPos target = blockPosition().relative(getDirection());
+        BlockState state = level().getBlockState(target);
+        float hardness = state.getDestroySpeed(level(), target);
+        if (!state.isAir() && hardness >= 0.0F && hardness <= 3.0F
+                && state.getBlock() != Blocks.BEDROCK && state.getBlock() != Blocks.WATER
+                && state.getBlock() != Blocks.LAVA) {
+            level().destroyBlock(target, true, this);
+            level().playSound(null, target, UnhollowingMod.FORGOTTEN_CALL.get(), SoundSource.HOSTILE, 0.45F, 0.55F);
+        }
     }
 }
