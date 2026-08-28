@@ -1,0 +1,11 @@
+{
+  "type": "forge:climate",
+  "biomes": "unhollowing:redwood_forest",
+  "temperature": 0.7,
+  "humidity": 0.8,
+  "continentalness": 0.6,
+  "erosion": 0.3,
+  "weirdness": 0.0,
+  "offset": 0.0,
+  "weight": 8
+}

@@ -1,0 +1,5 @@
+{
+  "type": "forge:add_biome",
+  "biomes": "unhollowing:redwood_forest",
+  "category": "forest"
+}
