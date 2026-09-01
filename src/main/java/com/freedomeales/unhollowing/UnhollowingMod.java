@@ -14,9 +14,6 @@ import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 
-import com.freedomeales.unhollowing.UnhollowingEntities;
-
-
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -29,10 +26,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-
-
 
 @Mod(UnhollowingMod.MOD_ID)
 @SuppressWarnings("null")
@@ -90,13 +83,6 @@ public final class UnhollowingMod {
                 .mobSpawnSettings(new MobSpawnSettings.Builder().build())
                 .generationSettings(BiomeGenerationSettings.EMPTY).build());
 
-public UnhollowingMod() {
-    UnhollowingEntities.ENTITIES.register(
-        net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus()
-    );
-}
-
-
     public static final RegistryObject<EntityType<WatcherEntity>> WATCHER = ENTITY_TYPES.register("watcher",
             () -> EntityType.Builder.of(WatcherEntity::new, MobCategory.MONSTER)
                     .sized(0.45F, 2.7F)
@@ -128,6 +114,7 @@ public UnhollowingMod() {
 
     private void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(WATCHER.get(), WatcherEntity.createAttributes().build());
+        event.put(UnhollowingEntities.FORGOTTEN.get(), ForgottenEntity.createAttributes().build());
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -137,8 +124,12 @@ public UnhollowingMod() {
 
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-            event.enqueueWork(() -> net.minecraft.client.renderer.entity.EntityRenderers.register(
-                    WATCHER.get(), WatcherRenderer::new));
+            event.enqueueWork(() -> {
+                net.minecraft.client.renderer.entity.EntityRenderers.register(
+                    WATCHER.get(), WatcherRenderer::new);
+                net.minecraft.client.renderer.entity.EntityRenderers.register(
+                    UnhollowingEntities.FORGOTTEN.get(), ForgottenRenderer::new);
+            });
         }
     }
 }

@@ -1,5 +1,6 @@
 {
-  "type": "forge:add_biome",
+  "type": "forge:add_features",
   "biomes": "unhollowing:blackwood_forest",
-  "category": "forest"
+  "features": ["unhollowing:blackbark_tree"],
+  "step": "vegetal_decoration"
 }
