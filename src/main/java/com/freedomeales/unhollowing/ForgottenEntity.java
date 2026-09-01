@@ -210,8 +210,10 @@ public final class ForgottenEntity extends Monster {
             baseSpeed = 0.30D; // Beginning to adapt
         }
         
-        // Apply the learned speed
-        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(baseSpeed);
+        // Apply the learned speed safely if the attribute has been registered
+        if (this.getAttribute(Attributes.MOVEMENT_SPEED) != null) {
+            this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(baseSpeed);
+        }
     }
 
     /**

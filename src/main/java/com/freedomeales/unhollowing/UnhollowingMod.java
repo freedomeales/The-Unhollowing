@@ -1,7 +1,9 @@
 package com.freedomeales.unhollowing;
 
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -113,8 +115,17 @@ public final class UnhollowingMod {
     }
 
     private void registerAttributes(EntityAttributeCreationEvent event) {
-        event.put(WATCHER.get(), WatcherEntity.createAttributes().build());
-        event.put(UnhollowingEntities.FORGOTTEN.get(), ForgottenEntity.createAttributes().build());
+        registerSafeAttribute(event, WATCHER.get(), WatcherEntity.createAttributes().build());
+        registerSafeAttribute(event, UnhollowingEntities.FORGOTTEN.get(), ForgottenEntity.createAttributes().build());
+    }
+
+    private static <T extends LivingEntity> void registerSafeAttribute(
+            EntityAttributeCreationEvent event,
+            EntityType<T> entityType,
+            AttributeSupplier attributeSupplier) {
+        if (entityType != null && attributeSupplier != null) {
+            event.put(entityType, attributeSupplier);
+        }
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
