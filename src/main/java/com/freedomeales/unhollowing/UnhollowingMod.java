@@ -94,6 +94,7 @@ public final class UnhollowingMod {
     public UnhollowingMod(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();
         ENTITY_TYPES.register(modEventBus);
+        UnhollowingEntities.ENTITIES.register(modEventBus);
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         SOUNDS.register(modEventBus);
