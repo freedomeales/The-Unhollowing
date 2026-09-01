@@ -123,11 +123,28 @@ public final class HorrorEvents {
             }
             Vec3 toTorch = Vec3.atCenterOf(pos).subtract(player.getEyePosition());
             if (look.dot(toTorch.normalize()) < -0.35D) {
-                player.level().setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+                // Convert torch to redstone torch instead of extinguishing
+                convertToRedstoneTorch(player, pos, state);
                 player.level().playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 0.8F);
                 return;
             }
         }
+    }
+
+    /**
+     * Convert a torch to a redstone torch (eerie effect)
+     */
+    private static void convertToRedstoneTorch(net.minecraft.server.level.ServerPlayer player, BlockPos pos, BlockState state) {
+        net.minecraft.world.level.block.Block torchBlock = state.getBlock();
+        
+        if (torchBlock == Blocks.TORCH) {
+            player.level().setBlock(pos, Blocks.REDSTONE_TORCH.defaultBlockState(), 3);
+        } else if (torchBlock == Blocks.WALL_TORCH) {
+            player.level().setBlock(pos, Blocks.REDSTONE_WALL_TORCH.defaultBlockState(), 3);
+        }
+        
+        // Play eerie redstone sound
+        player.level().playSound(null, pos, SoundEvents.REDSTONE_TORCH_BURNOUT, SoundSource.BLOCKS, 0.5F, 0.8F);
     }
 
     private static boolean isTorch(net.minecraft.world.level.block.Block block) {

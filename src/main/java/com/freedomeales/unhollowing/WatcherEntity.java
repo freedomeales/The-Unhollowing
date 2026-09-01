@@ -2,8 +2,6 @@ package com.freedomeales.unhollowing;
 
 import javax.annotation.Nonnull;
 
-import com.freedomeales.unhollowing.UnhollowingEntities;
-
 
 import java.util.List;
 
