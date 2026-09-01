@@ -159,3 +159,4 @@ All features are fully functional and integrated with Minecraft's world generati
 ## Horror Checklist
 
 <p>The current build includes motionless staring mobs, torches that can go out behind the player, custom cave footsteps and breathing, temporary structures that disappear when approached, confused and glowing animals, a habit-aware Forgotten that targets isolated players, stronger events deeper underground, and books addressed to the player's own name.</p>
+got it can we make it tho so the mod

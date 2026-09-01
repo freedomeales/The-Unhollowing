@@ -80,29 +80,29 @@ public final class ForgottenEntity extends Monster {
         if (this.getTarget() instanceof ServerPlayer player) {
             targetPlayer = player;
             
-            // LEARN SPRINT HABITS — NEVER FORGET
-            if (player.isSprinting()) {
-                int habit = player.getPersistentData().getInt("unhollowing_forgotten_habit");
-                habit += 25;
-                player.getPersistentData().putInt("unhollowing_forgotten_habit", habit);
-            }
+            // LEARN PLAYER PATTERNS — NEVER FORGET
+            recordPlayerLearningPatterns(player);
             
             // Adapt speed based on learned habits
             updateLearnedSpeed(player);
             
             // Random chat messages
-            if (this.random.nextInt(400) == 0 && !player.isSpectator()) {
+            if (this.random.nextInt(240) == 0 && !player.isSpectator()) {
                 sendForgottenMessage(player);
             }
             
             // Apply nausea if staring (eyes glowing)
             if (shouldHaveGlowingEyes() && isStaringAtPlayer(player)) {
                 player.addEffect(new MobEffectInstance(
-                    MobEffects.CONFUSION, 60, 1, false, false));
+                    MobEffects.CONFUSION, 90, 1, false, false));
+                if (this.distanceTo(player) <= 7.0D) {
+                    player.addEffect(new MobEffectInstance(
+                        MobEffects.BLINDNESS, 25, 0, false, false));
+                }
             }
             
             // Occasionally break nearby soft blocks
-            if (this.random.nextInt(60) == 0) {
+            if (this.random.nextInt(40) == 0) {
                 breakNearbySoftBlocks();
             }
         }
@@ -116,14 +116,14 @@ public final class ForgottenEntity extends Monster {
             apparitionCooldown--;
         }
 
-        if (isPhasing() && this.random.nextInt(100) == 0 && apparitionCooldown == 0) {
+        if (isPhasing() && this.random.nextInt(80) == 0 && apparitionCooldown == 0) {
             // Rarely appear
             setPhasing(false);
-            apparitionCooldown = 200; // 10 seconds before next change
-        } else if (!isPhasing() && this.random.nextInt(120) == 0 && apparitionCooldown == 0) {
+            apparitionCooldown = 150; // 7.5 seconds before next change
+        } else if (!isPhasing() && this.random.nextInt(90) == 0 && apparitionCooldown == 0) {
             // Disappear after appearing
             setPhasing(true);
-            apparitionCooldown = 100; // Reappear soon
+            apparitionCooldown = 90; // Reappear soon
         }
     }
 
@@ -171,19 +171,43 @@ public final class ForgottenEntity extends Monster {
      * Update movement speed based on learned sprint habits
      * The Forgotten learns and adapts to player behavior — NEVER FORGETS
      */
+    private void recordPlayerLearningPatterns(ServerPlayer player) {
+        int habit = player.getPersistentData().getInt("unhollowing_forgotten_habit");
+
+        if (player.isSprinting()) {
+            habit += 35;
+        }
+        if (player.isCrouching()) {
+            habit += 10;
+        }
+        if (player.getDeltaMovement().lengthSqr() > 0.12D) {
+            habit += 12;
+        }
+        if (player.getPersistentData().getBoolean("unhollowing_recent_block_break")) {
+            habit += 50;
+            player.getPersistentData().remove("unhollowing_recent_block_break");
+        }
+        if (player.getPersistentData().getBoolean("unhollowing_recent_block_place")) {
+            habit += 35;
+            player.getPersistentData().remove("unhollowing_recent_block_place");
+        }
+
+        player.getPersistentData().putInt("unhollowing_forgotten_habit", Math.min(habit, 20000));
+    }
+
     private void updateLearnedSpeed(ServerPlayer player) {
         int learnedHabit = player.getPersistentData().getInt("unhollowing_forgotten_habit");
         
         double baseSpeed = 0.25D; // Base speed
         
-        if (learnedHabit > 1000) {
-            baseSpeed = 0.45D; // Very learned - becomes much faster
-        } else if (learnedHabit > 600) {
-            baseSpeed = 0.40D; // Well learned
-        } else if (learnedHabit > 300) {
-            baseSpeed = 0.32D; // Starting to learn
-        } else if (learnedHabit > 100) {
-            baseSpeed = 0.28D; // Beginning to adapt
+        if (learnedHabit > 1500) {
+            baseSpeed = 0.48D; // Very learned - becomes much faster
+        } else if (learnedHabit > 900) {
+            baseSpeed = 0.42D; // Well learned
+        } else if (learnedHabit > 500) {
+            baseSpeed = 0.35D; // Starting to learn
+        } else if (learnedHabit > 180) {
+            baseSpeed = 0.30D; // Beginning to adapt
         }
         
         // Apply the learned speed
@@ -198,20 +222,20 @@ public final class ForgottenEntity extends Monster {
             cornerPeekTimer--;
             
             // Teleport to corner peek position for rare appearance
-            if (cornerPeekTimer == 10 && cornerPeekPosition != null) {
+            if (cornerPeekTimer == 12 && cornerPeekPosition != null) {
                 this.moveTo(cornerPeekPosition.x, cornerPeekPosition.y, cornerPeekPosition.z,
                     this.getYRot(), this.getXRot());
                 setPhasing(false); // Briefly visible
             } else if (cornerPeekTimer == 0) {
                 setPhasing(true); // Disappear after peeking
             }
-        } else if (this.random.nextInt(400) == 0 && targetPlayer != null) {
+        } else if (this.random.nextInt(260) == 0 && targetPlayer != null) {
             // Rare chance to peek around corner
             Vec3 playerLook = targetPlayer.getLookAngle().normalize();
-            Vec3 peekPos = this.position().add(playerLook.scale(3)).add(0, 0.5, 0);
+            Vec3 peekPos = this.position().add(playerLook.scale(2.5)).add(0, 0.6, 0);
             
             cornerPeekPosition = peekPos;
-            cornerPeekTimer = 60; // 3 seconds
+            cornerPeekTimer = 48; // ~2.4 seconds
         }
     }
 

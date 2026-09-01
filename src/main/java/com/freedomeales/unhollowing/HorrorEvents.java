@@ -40,6 +40,19 @@ public final class HorrorEvents {
             return;
         }
 
+        if (player.isSprinting()) {
+            int habit = player.getPersistentData().getInt("unhollowing_forgotten_habit");
+            player.getPersistentData().putInt("unhollowing_forgotten_habit", Math.min(habit + 8, 20000));
+        }
+        if (player.isCrouching()) {
+            int habit = player.getPersistentData().getInt("unhollowing_forgotten_habit");
+            player.getPersistentData().putInt("unhollowing_forgotten_habit", Math.min(habit + 4, 20000));
+        }
+        if (player.getDeltaMovement().lengthSqr() > 0.12D) {
+            int habit = player.getPersistentData().getInt("unhollowing_forgotten_habit");
+            player.getPersistentData().putInt("unhollowing_forgotten_habit", Math.min(habit + 6, 20000));
+        }
+
         updateIllusions(player);
         updateStillMobs(player);
         if (player.tickCount % 20 != 0) {
@@ -95,6 +108,26 @@ public final class HorrorEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onBlockBreak(net.minecraftforge.event.level.BlockEvent.BreakEvent event) {
+        if (event.getPlayer() instanceof net.minecraft.server.level.ServerPlayer player) {
+            float hardness = event.getState().getDestroySpeed(player.level(), event.getPos());
+            int gain = (int) Math.max(20.0F, hardness * 18.0F);
+            int habit = player.getPersistentData().getInt("unhollowing_forgotten_habit");
+            player.getPersistentData().putInt("unhollowing_forgotten_habit", Math.min(habit + gain, 20000));
+            player.getPersistentData().putBoolean("unhollowing_recent_block_break", true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onBlockPlace(net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent event) {
+        if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer player) {
+            int habit = player.getPersistentData().getInt("unhollowing_forgotten_habit");
+            player.getPersistentData().putInt("unhollowing_forgotten_habit", Math.min(habit + 30, 20000));
+            player.getPersistentData().putBoolean("unhollowing_recent_block_place", true);
+        }
+    }
+
     private static void updateStillMobs(net.minecraft.server.level.ServerPlayer player) {
         for (Mob mob : player.level().getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(12.0D),
             mob -> !(mob instanceof WatcherEntity))) {
@@ -104,16 +137,13 @@ public final class HorrorEvents {
                 data.putInt("unhollowing_still_ticks", stillTicks - 1);
                 mob.setDeltaMovement(Vec3.ZERO);
                 mob.getLookControl().setLookAt(player, 30.0F, 30.0F);
-            } else if (player.tickCount % 100 == 0 && player.getRandom().nextInt(8) == 0) {
-                data.putInt("unhollowing_still_ticks", 60);
+            } else if (player.tickCount % 80 == 0 && player.getRandom().nextInt(5) == 0) {
+                data.putInt("unhollowing_still_ticks", 100);
             }
         }
     }
 
     private static void extinguishTorchBehindPlayer(net.minecraft.server.level.ServerPlayer player) {
-        if (player.getRandom().nextInt(5) != 0) {
-            return;
-        }
         BlockPos origin = player.blockPosition();
         Vec3 look = player.getLookAngle();
         for (BlockPos pos : BlockPos.betweenClosed(origin.offset(-6, -3, -6), origin.offset(6, 3, 6))) {
@@ -123,7 +153,6 @@ public final class HorrorEvents {
             }
             Vec3 toTorch = Vec3.atCenterOf(pos).subtract(player.getEyePosition());
             if (look.dot(toTorch.normalize()) < -0.35D) {
-                // Convert torch to redstone torch instead of extinguishing
                 convertToRedstoneTorch(player, pos, state);
                 player.level().playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 0.8F);
                 return;
@@ -137,9 +166,9 @@ public final class HorrorEvents {
     private static void convertToRedstoneTorch(net.minecraft.server.level.ServerPlayer player, BlockPos pos, BlockState state) {
         net.minecraft.world.level.block.Block torchBlock = state.getBlock();
         
-        if (torchBlock == Blocks.TORCH) {
+        if (torchBlock == Blocks.TORCH || torchBlock == Blocks.SOUL_TORCH) {
             player.level().setBlock(pos, Blocks.REDSTONE_TORCH.defaultBlockState(), 3);
-        } else if (torchBlock == Blocks.WALL_TORCH) {
+        } else if (torchBlock == Blocks.WALL_TORCH || torchBlock == Blocks.SOUL_WALL_TORCH) {
             player.level().setBlock(pos, Blocks.REDSTONE_WALL_TORCH.defaultBlockState(), 3);
         }
         
@@ -153,15 +182,15 @@ public final class HorrorEvents {
     }
 
     private static void distortNearbyAnimals(net.minecraft.server.level.ServerPlayer player, int depth) {
-        if (depth < 12 || player.getRandom().nextInt(10) != 0) {
+        if (depth < 12 || player.getRandom().nextInt(6) != 0) {
             return;
         }
         for (Animal animal : player.level().getEntitiesOfClass(Animal.class, player.getBoundingBox().inflate(16.0D),
                 Animal::isAlive)) {
-            animal.addEffect(new MobEffectInstance(MobEffects.GLOWING, 120, 0, false, false));
-            animal.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 100, 0, false, false));
+            animal.addEffect(new MobEffectInstance(MobEffects.GLOWING, 160, 0, false, false));
+            animal.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 140, 0, false, false));
             animal.getPersistentData().putBoolean("unhollowing_distorted", true);
-            animal.getLookControl().setLookAt(player, 20.0F, 20.0F);
+            animal.getLookControl().setLookAt(player, 25.0F, 25.0F);
             break;
         }
     }
