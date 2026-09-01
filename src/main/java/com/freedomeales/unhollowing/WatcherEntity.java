@@ -177,7 +177,9 @@ public void tick()
             learnedSpeed = 0.44D;
         }
 
-        getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(learnedSpeed);
+        if (getAttribute(Attributes.MOVEMENT_SPEED) != null) {
+            getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(learnedSpeed);
+        }
 
         double distance = distanceTo(player);
         if (distance <= 12.0D && hasLineOfSight(player) && player.getRandom().nextInt(3) == 0) {
