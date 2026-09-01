@@ -128,10 +128,26 @@ public void tick()
         }
 
         // --- FASTER LEARNING, NEVER FORGET ---
-        if (getTarget() instanceof Player player && player.isSprinting()) {
+        if (getTarget() instanceof Player player) {
             int habit = player.getPersistentData().getInt("unhollowing_sprint_habit");
-            habit += 30;
-            player.getPersistentData().putInt("unhollowing_sprint_habit", habit);
+            if (player.isSprinting()) {
+                habit += 35;
+            }
+            if (player.isCrouching()) {
+                habit += 8;
+            }
+            if (player.getDeltaMovement().lengthSqr() > 0.12D) {
+                habit += 12;
+            }
+            if (player.getPersistentData().getBoolean("unhollowing_recent_block_break")) {
+                habit += 45;
+                player.getPersistentData().remove("unhollowing_recent_block_break");
+            }
+            if (player.getPersistentData().getBoolean("unhollowing_recent_block_place")) {
+                habit += 30;
+                player.getPersistentData().remove("unhollowing_recent_block_place");
+            }
+            player.getPersistentData().putInt("unhollowing_sprint_habit", Math.min(habit, 20000));
         }
 
         // --- ORIGINAL HORROR LOGIC BELOW (kept exactly as you wrote it) ---
